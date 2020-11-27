@@ -104,7 +104,7 @@ class LeftPane extends VBox {
         VBox.setVgrow(playlistList, Priority.ALWAYS);
         setAlignment(Pos.TOP_CENTER);
         setSpacing(24);
-        setPadding(new Insets(20,0,0,0));
+        setPadding(new Insets(20,0,0,5));
     }
 }
 

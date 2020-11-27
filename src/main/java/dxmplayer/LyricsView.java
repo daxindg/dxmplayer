@@ -2,6 +2,7 @@ package dxmplayer;
 
 
 
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -34,9 +35,11 @@ public class LyricsView extends HBox {
     static ChangeListener<Duration> currentTimeListener = (ov, old, val) -> {
         for (var item : lyrics.getLyrics()) {
             if (val.toMillis() > item.start.toMillis() && val.toMillis() < item.end.toMillis()) {
-                LyricsView.lyricsList.scrollTo(Math.max(lyrics.getLyrics().indexOf(item) - 3, 0));
-                LyricsView.lyricsList.getSelectionModel().select(item);
-                item.setPlaying(true);
+                if (!item.getPlaying()) {
+                    LyricsView.lyricsList.scrollTo(Math.max(lyrics.getLyrics().indexOf(item) - 3, 0));
+                    LyricsView.lyricsList.getSelectionModel().select(item);
+                    item.setPlaying(true);
+                }
             }
             else item.setPlaying(false);
         }
@@ -44,7 +47,7 @@ public class LyricsView extends HBox {
     {
         getChildren().add(lyricsList);
         setAlignment(Pos.CENTER);
-        lyricsList.setOnScroll(e -> {
+        setOnScroll(e -> {
             if (timer != null) timer.cancel();
             removeListener();
             timer = new Timer();
@@ -55,16 +58,16 @@ public class LyricsView extends HBox {
                 }
             }, 1000);
         });
-
     }
 
     static void addListener() {
+        if (Player.mediaPlayer == null) return;
         Player.mediaPlayer.currentTimeProperty().addListener(currentTimeListener);
     }
 
     static void removeListener() {
+        if (Player.mediaPlayer == null) return;
         Player.mediaPlayer.currentTimeProperty().removeListener(currentTimeListener);
-
     }
 
 }
