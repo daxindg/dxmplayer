@@ -32,7 +32,6 @@ jlink {
     jpackage {
 //        imageOptions = ["--icon", "dxmplayer.ico"]
         skipInstaller = true
-
     }
 
 }
