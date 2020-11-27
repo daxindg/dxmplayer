@@ -83,22 +83,24 @@ class Lyrics {
 
             while (scan.hasNextLine()) {
                 var line = scan.nextLine();
-                if (line.length() < 10 || !line.contains("[") || !line.contains("]") || !line.contains(":") || !line.contains(".")) continue;
+                if (line.length() < 10 || !line.contains("[") || !line.contains("]") || !line.contains(":") || !line.contains("."))
+                    continue;
 
                 try {
-                    String time = line.substring(1, 9);
+                    int e = line.indexOf("]");
+                    String time = line.substring(1, e);
                     time = time.replace('.', ':');
                     var x = time.split(":");
                     double res = 0;
                     res += Double.parseDouble(x[0]) * 60000;
                     res += Double.parseDouble(x[1]) * 1000;
-                    res += Double.parseDouble(x[2]) * 10;
-                    tmp.add(new Pair<>(res, line.substring(10)));
-
-                }
-                catch (Exception ignored) {
+                    if (e == 9) res += Double.parseDouble(x[2]) * 10;
+                    else if (e == 10) res += Double.parseDouble(x[2]);
+                    tmp.add(new Pair<>(res, line.substring(e + 1)));
+                } catch (Exception ignored) {
                 }
             }
+
             if (!tmp.isEmpty()) {
                 var pre = tmp.get(tmp.size() - 1).getKey();
                 lyrics.add(new LyricLine(tmp.get(tmp.size() - 1).getValue(), new Duration(pre), new Duration(pre * 2)));
