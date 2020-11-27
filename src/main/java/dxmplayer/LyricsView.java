@@ -1,8 +1,6 @@
 package dxmplayer;
 
 
-
-import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -149,7 +147,7 @@ class LyricsList extends ListView<LyricLine> {
             container.setAlignment(Pos.CENTER);
             container.setOnMouseClicked(e -> {
                 Player.mediaPlayer.seek(getItem().start);
-                getItem().setPlaying(true);
+//                getItem().setPlaying(true);
             });
 
             setAlignment(Pos.CENTER);

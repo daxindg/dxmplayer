@@ -1,8 +1,6 @@
 package dxmplayer;
 
 import dxmplayer.icons.*;
-import javafx.beans.InvalidationListener;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

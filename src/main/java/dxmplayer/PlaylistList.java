@@ -57,9 +57,7 @@ class PlaylistListWrapper extends VBox {
 
         btnNewPlayList.setOnMouseClicked(e -> items.add(new PlaylistList.ListItem("Default Playlist " + items.size())));
 
-        indexOfSelected.addListener((ov, old, val) -> {
-            Layout.rightPane.playlist.playlist.setItems(items.get(val.intValue()).playlist);
-        });
+        indexOfSelected.addListener((ov, old, val) -> Layout.rightPane.playlist.playlist.setItems(items.get(val.intValue()).playlist));
 
 
         getChildren().addAll(header, playlistList);
@@ -184,9 +182,7 @@ class PlaylistList extends ListView<PlaylistList.ListItem> {
             super.updateItem(item, empty);
             if (item != null && !empty) {
                 name.setText(item.name.get());
-                btnChooseFile.setOnMouseClicked(e -> {
-                    PlaylistListWrapper.appendToPlaylist(btnChooseFile.getFiles(), item.playlist);
-                });
+                btnChooseFile.setOnMouseClicked(e -> PlaylistListWrapper.appendToPlaylist(btnChooseFile.getFiles(), item.playlist));
 
                 if (item.isPlaying() && Player.mediaPlayer != null && Player.mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
                     playAnimation();
