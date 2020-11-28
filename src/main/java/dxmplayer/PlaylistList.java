@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 import static dxmplayer.App.mainStage;
 
 
-class PlaylistListWrapper extends VBox {
+class PlaylistListView extends VBox {
 
-    static ObservableList<PlaylistList.ListItem> items = FXCollections.observableArrayList(PlaylistList.ListItem.extractor());
+    static ObservableList<PlaylistList.PlaylistItem> items = FXCollections.observableArrayList(PlaylistList.PlaylistItem.extractor());
     static PlaylistList playlistList = new PlaylistList(items);
     HBox header = new HBox();
     Button btnNewPlayList = new Button();
@@ -46,7 +46,7 @@ class PlaylistListWrapper extends VBox {
         header.setPadding(new Insets(0, 0, 6, 15));
 
         header.setStyle("-fx-border-style: hidden hidden solid hidden; -fx-border-color: #282828; -fx-border-width: 2px");
-        items.add(new PlaylistList.ListItem("Default Playlist"));
+        items.add(new PlaylistList.PlaylistItem("Default Playlist"));
         playlistList.getSelectionModel().select(0);
 
 
@@ -55,7 +55,7 @@ class PlaylistListWrapper extends VBox {
         indexOfSelected.bind(playlistList.getSelectionModel().selectedIndexProperty());
 
 
-        btnNewPlayList.setOnMouseClicked(e -> items.add(new PlaylistList.ListItem("Default Playlist " + items.size())));
+        btnNewPlayList.setOnMouseClicked(e -> items.add(new PlaylistList.PlaylistItem("Default Playlist " + items.size())));
 
         indexOfSelected.addListener((ov, old, val) -> Layout.rightPane.playlist.playlist.setItems(items.get(val.intValue()).playlist));
 
@@ -64,15 +64,15 @@ class PlaylistListWrapper extends VBox {
         setSpacing(6);
     }
 
-    static ObservableList<ListItem> getSelectedPlaylist() {
+    static ObservableList<SongItem> getSelectedPlaylist() {
         return getSelectedItem().playlist;
     }
 
-    static PlaylistList.ListItem getSelectedItem() {
+    static PlaylistList.PlaylistItem getSelectedItem() {
         return items.get(indexOfSelected.get());
     }
 
-    static void appendToPlaylist(List<String> list, ObservableList<ListItem> playlist) {
+    static void appendToPlaylist(List<String> list, ObservableList<SongItem> playlist) {
         if (items.isEmpty()) return;
         var newItems = list.stream().filter(el -> {
             try {
@@ -87,7 +87,7 @@ class PlaylistListWrapper extends VBox {
             var mdp = new MediaPlayer(new Media(uri));
 
             mdp.setOnReady(() -> {
-                var newItem = new ListItem(uri,FXCollections.observableMap(mdp.getMedia().getMetadata()), new Duration(mdp.getTotalDuration().toMillis()));
+                var newItem = new SongItem(uri,FXCollections.observableMap(mdp.getMedia().getMetadata()), new Duration(mdp.getTotalDuration().toMillis()));
                 playlist.add(newItem);
                 mdp.dispose();
             });
@@ -95,16 +95,16 @@ class PlaylistListWrapper extends VBox {
     }
 }
 
-class PlaylistList extends ListView<PlaylistList.ListItem> {
-    PlaylistList(ObservableList<ListItem> list) {
-        setCellFactory(x -> new ListRow());
+class PlaylistList extends ListView<PlaylistList.PlaylistItem> {
+    PlaylistList(ObservableList<PlaylistItem> list) {
+        setCellFactory(x -> new PlaylistListRow());
         setItems(list);
     }
-    static class ListItem {
+    static class PlaylistItem {
         StringProperty name;
-        ObservableList<dxmplayer.ListItem>  playlist = FXCollections.observableArrayList(dxmplayer.ListItem.extractor());
+        ObservableList<SongItem>  playlist = FXCollections.observableArrayList(SongItem.extractor());
         BooleanProperty playing = new SimpleBooleanProperty(false);
-        ListItem(String name) {
+        PlaylistItem(String name) {
             this.name = new SimpleStringProperty(name);
         }
 
@@ -112,12 +112,12 @@ class PlaylistList extends ListView<PlaylistList.ListItem> {
             return playing.get();
         }
 
-        public static Callback<ListItem, Observable[]> extractor() {
+        public static Callback<PlaylistItem, Observable[]> extractor() {
             return param -> new Observable[]{param.name, param.playing};
         }
     }
 
-    static class ListRow extends ListCell<ListItem> {
+    static class PlaylistListRow extends ListCell<PlaylistItem> {
         private final HBox container = new HBox();
         private final TextField name = new TextField("Default Playlist");
         private final ChooseFileButton btnChooseFile = new ChooseFileButton();
@@ -127,14 +127,14 @@ class PlaylistList extends ListView<PlaylistList.ListItem> {
         ContextMenu contextMenu =  new ContextMenu(remove);
 
         AnimationFX animation = new Swing(playingIcon);
-        ListRow() {
+        PlaylistListRow() {
             setAlignment(Pos.CENTER);
             setStyle("-fx-background-radius: 0;");
             setContextMenu(contextMenu);
 
             remove.setOnAction(e -> {
                 if (Player.playListItem == getItem()) return;
-                PlaylistListWrapper.items.remove(getItem());
+                PlaylistListView.items.remove(getItem());
             });
 
             playingIcon.setVisible(false);
@@ -145,7 +145,7 @@ class PlaylistList extends ListView<PlaylistList.ListItem> {
             name.setEditable(false);
             name.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 1) {
-                    PlaylistListWrapper.playlistList.getSelectionModel().select(getItem());
+                    PlaylistListView.playlistList.getSelectionModel().select(getItem());
                     Layout.rightPane.playlistName.setText(getItem().name.get());
                 }
                 if (e.getClickCount() == 2) {
@@ -178,18 +178,18 @@ class PlaylistList extends ListView<PlaylistList.ListItem> {
         }
 
         @Override
-        protected void updateItem(ListItem item, boolean empty) {
+        protected void updateItem(PlaylistItem item, boolean empty) {
             super.updateItem(item, empty);
             if (item != null && !empty) {
                 name.setText(item.name.get());
-                btnChooseFile.setOnMouseClicked(e -> PlaylistListWrapper.appendToPlaylist(btnChooseFile.getFiles(), item.playlist));
+                btnChooseFile.setOnMouseClicked(e -> PlaylistListView.appendToPlaylist(btnChooseFile.getFiles(), item.playlist));
 
                 if (item.isPlaying() && Player.mediaPlayer != null && Player.mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
                     playAnimation();
                 }
 
                 else stopAnimation();
-                Layout.rightPane.playlistName.setText(PlaylistListWrapper.getSelectedItem().name.get());
+                Layout.rightPane.playlistName.setText(PlaylistListView.getSelectedItem().name.get());
                 setGraphic(container);
             } else setGraphic(null);
         }

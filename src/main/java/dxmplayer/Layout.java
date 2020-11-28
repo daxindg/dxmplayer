@@ -87,7 +87,7 @@ class WindowManageBar extends HBox {
 
 class LeftPane extends VBox {
     Button logo = new Button();
-    PlaylistListWrapper playlistList = new PlaylistListWrapper();
+    PlaylistListView playlistList = new PlaylistListView();
     ImageView imageView = new ImageView();
     StackPane nowCover = new StackPane();
     LeftPane() {
@@ -110,7 +110,7 @@ class LeftPane extends VBox {
 
 class RightPane extends StackPane {
     VBox playlistView = new VBox();
-    PlayListWrapper playlist = new PlayListWrapper();
+    PlaylistView playlist = new PlaylistView();
 
     LyricsView lyricsView = new LyricsView();
     HBox header = new HBox();

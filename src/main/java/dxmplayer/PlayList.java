@@ -19,14 +19,14 @@ import javafx.util.Duration;
 import java.util.Arrays;
 
 
-class PlayListWrapper extends VBox {
+class PlaylistView extends VBox {
     PlayList playlist = new PlayList();
     Label sharp = new Label("#");
     Label title = new Label("TITLE");
     Label album = new Label("ALBUM");
     Label duration = new Label();
     HBox header = new HBox();
-    PlayListWrapper() {
+    PlaylistView() {
         var durationIcon = new Region();
         durationIcon.getStyleClass().add("duration-icon");
         this.duration.setGraphic(durationIcon);
@@ -57,7 +57,7 @@ class PlayListWrapper extends VBox {
     }
 }
 
-class PlayList extends ListView<ListItem> {
+class PlayList extends ListView<SongItem> {
 
     PlayList() {
         setSelectionModel(new NoSelectionModel<>());
@@ -68,25 +68,25 @@ class PlayList extends ListView<ListItem> {
 
 }
 
-class ListItem{
+class SongItem {
     ObservableMap<String, Object> meta;
     String fileUri;
     Duration totalTime;
     BooleanProperty playing = new SimpleBooleanProperty(false);
-    ListItem(String uri, ObservableMap<String, Object> meta, Duration totalTime) {
+    SongItem(String uri, ObservableMap<String, Object> meta, Duration totalTime) {
         this.totalTime = totalTime;
         this.meta = meta;
         this.fileUri = uri;
     }
 
-    int getId() {return  PlaylistListWrapper.getSelectedPlaylist().indexOf(this) + 1;}
+    int getId() {return  PlaylistListView.getSelectedPlaylist().indexOf(this) + 1;}
 
-    public static Callback<ListItem, Observable[]> extractor() {
+    public static Callback<SongItem, Observable[]> extractor() {
         return param -> new Observable[]{param.meta, param.playing};
     }
 }
 
-class PlayListRow extends ListCell<ListItem> {
+class PlayListRow extends ListCell<SongItem> {
     private final HBox container = new HBox();
     private TitleSection titleSection = new TitleSection(FXCollections.emptyObservableMap());
     private final Label album = new Label("<No Album>");
@@ -109,7 +109,7 @@ class PlayListRow extends ListCell<ListItem> {
         container.getChildren().addAll(idBox, titleSection, albumBox, timeBox);
         container.setStyle("-fx-min-height: 60px; -fx-padding: 10px");
         setContextMenu(contextMenu);
-        remove.setOnAction(e -> PlaylistListWrapper.getSelectedPlaylist().remove(getItem()));
+        remove.setOnAction(e -> PlaylistListView.getSelectedPlaylist().remove(getItem()));
 
         for (var x : Arrays.asList(titleSection, albumBox)) {
             HBox.setHgrow(x, Priority.ALWAYS);
@@ -120,11 +120,11 @@ class PlayListRow extends ListCell<ListItem> {
         container.setSpacing(10);
         container.setOnMouseClicked(e-> {
             if (e.getClickCount() == 2) {
-                if (Player.getPlaylist() != PlaylistListWrapper.getSelectedPlaylist()) {
+                if (Player.getPlaylist() != PlaylistListView.getSelectedPlaylist()) {
                     if (Player.getPlayListItem() != null) {
                         Player.getPlayListItem().playing.set(false);
                     }
-                    Player.setup(PlaylistListWrapper.getSelectedItem());
+                    Player.setup(PlaylistListView.getSelectedItem());
                 }
                 Player.play(Integer.parseInt(id.getText()) - 1);
             }
@@ -134,7 +134,7 @@ class PlayListRow extends ListCell<ListItem> {
 
 
     @Override
-    protected void updateItem(ListItem item, boolean empty) {
+    protected void updateItem(SongItem item, boolean empty) {
         super.updateItem(item, empty);
         if (item != null && !empty) {
             container.getChildren().removeAll(idBox, titleSection, albumBox, timeBox);

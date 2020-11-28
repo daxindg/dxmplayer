@@ -15,23 +15,23 @@ public class Player {
   static MediaPlayer mediaPlayer;
   static int repeat = 1;
   static boolean shuffle = false;
-  static PlaylistList.ListItem playListItem;
-  static ListItem playing;
+  static PlaylistList.PlaylistItem playListItem;
+  static SongItem playing;
   static IntegerProperty now = new SimpleIntegerProperty(0);
   static double volume = 1;
 
-  static ObservableList<ListItem> getPlaylist() {
+  static ObservableList<SongItem> getPlaylist() {
     return playListItem.playlist;
   }
 
-  static PlaylistList.ListItem getPlayListItem() {
+  static PlaylistList.PlaylistItem getPlayListItem() {
     return playListItem;
   }
-  static void setPlayListItem(PlaylistList.ListItem playListItem) {
+  static void setPlayListItem(PlaylistList.PlaylistItem playListItem) {
     Player.playListItem = playListItem;
   }
 
-  static void setup(PlaylistList.ListItem playList) {
+  static void setup(PlaylistList.PlaylistItem playList) {
 
     if (playListItem != null && !getPlaylist().isEmpty()) {
       getPlaylist().get(now.get()).playing.set(false);
@@ -46,7 +46,7 @@ public class Player {
     mediaPlayer = null;
     setPlayListItem(playList);
 
-    now = new SimpleIntegerProperty(-1);
+    now = new SimpleIntegerProperty(0);
     NowPlayingBar.addListener();
   }
 
